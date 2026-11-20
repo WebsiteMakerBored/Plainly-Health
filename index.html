@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plainly</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236a8a72' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
+:root {
+  --bg: #f7f6f4; --surface: #ffffff; --text: #1f1e1c; --text-muted: #6e6b66;
+  --accent: #6a8a72; --accent-hover: #5a7a62; --accent-soft: #e8f0e9; --border: #e4e1db;
+  --radius: 16px; --radius-sm: 12px; --radius-pill: 999px;
+  --shadow: 0 4px 16px rgba(31,30,28,0.08);
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px; --space-5:24px; --space-6:32px; --space-7:48px;
+  --font: 'Outfit', system-ui, sans-serif;
+  --fs-sm:14px; --fs-base:16px; --fs-md:20px; --fs-lg:28px; --fs-xl:36px;
+  --transition:200ms ease;
+}
+[data-theme="dark"] {
+  --bg:#1c1b19; --surface:#252422; --text:#f0eee9; --text-muted:#a8a59f;
+  --accent:#8fb396; --accent-hover:#7aa386; --accent-soft:#2a3a2e; --border:#3a3835;
+  --shadow:0 4px 16px rgba(0,0,0,0.3);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#1c1b19; --surface:#252422; --text:#f0eee9; --text-muted:#a8a59f;
+    --accent:#8fb396; --accent-hover:#7aa386; --accent-soft:#2a3a2e; --border:#3a3835;
+  }
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html,body { height:100%; -webkit-text-size-adjust:100%; }
+body { font-family:var(--font); background:var(--bg); color:var(--text); font-size:var(--fs-base); line-height:1.55; overflow-wrap:anywhere; -webkit-font-smoothing:antialiased; }
+button,input,select,textarea { font-family:inherit; font-size:inherit; color:inherit; }
+img,video,svg,canvas { max-width:100%; height:auto; }
+button { cursor:pointer; border:none; background:none; }
+a { color:var(--accent); text-decoration:none; }
+.app { display:flex; min-height:100vh; min-height:100dvh; }
+.sidebar { width:240px; background:var(--surface); border-right:1px solid var(--border); padding:var(--space-5); position:sticky; top:0; height:100vh; height:100dvh; overflow-y:auto; flex-shrink:0; }
+.sidebar h1 { font-size:var(--fs-md); font-weight:600; margin-bottom:var(--space-6); }
+.nav-item { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-3) var(--space-4); border-radius:var(--radius-sm); margin-bottom:var(--space-1); color:var(--text-muted); transition:background var(--transition),color var(--transition); min-height:44px; }
+.nav-item:hover { background:var(--accent-soft); color:var(--text); }
+.nav-item.active { background:var(--accent-soft); color:var(--accent); font-weight:500; }
+#main,.main { flex:1; min-width:0; padding:var(--space-6); max-width:900px; margin:0 auto; width:100%; }
+.bottom-nav { display:none; position:fixed; bottom:0; left:0; right:0; height:calc(68px + env(safe-area-inset-bottom,0px)); background:var(--surface); border-top:1px solid var(--border); z-index:10; padding:var(--space-2) 0 env(safe-area-inset-bottom,0px); }
+.bottom-nav .nav-item { flex-direction:column; gap:2px; font-size:var(--fs-sm); padding:var(--space-2); margin:0; flex:1; justify-content:center; min-height:56px; }
+.bottom-nav .nav-item svg { width:22px; height:22px; }
+@media (max-width:768px) {
+  .sidebar { display:none; }
+  .bottom-nav { display:flex; }
+  #main,.main { padding:var(--space-4) var(--space-4) calc(84px + env(safe-area-inset-bottom,0px)); }
+  .app { flex-direction:column; }
+  .input,.select,.textarea { font-size:16px; }
+}
+h2 { font-size:var(--fs-lg); font-weight:600; margin-bottom:var(--space-5); }
+h3 { font-size:var(--fs-md); font-weight:500; margin-bottom:var(--space-3); }
+.section { margin-bottom:var(--space-7); }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:var(--space-2); padding:10px 20px; border-radius:var(--radius-pill); font-weight:500; min-height:44px; transition:background var(--transition),color var(--transition); }
+.btn-primary { background:var(--accent); color:white; }
+.btn-primary:hover { background:var(--accent-hover); }
+.btn-secondary { background:transparent; border:1px solid var(--border); color:var(--text); }
+.btn-secondary:hover { background:var(--accent-soft); }
+.btn:disabled { opacity:0.5; cursor:not-allowed; }
+.btn:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.input,.select,.textarea { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--surface); min-height:44px; }
+.input:focus,.select:focus,.textarea:focus { outline:none; border-color:var(--accent); }
+.textarea { min-height:80px; resize:vertical; }
+label { display:block; margin-bottom:var(--space-1); font-weight:500; font-size:var(--fs-sm); }
+.progress { height:8px; background:var(--border); border-radius:var(--radius-pill); overflow:hidden; margin:var(--space-2) 0; }
+.progress-bar { height:100%; background:var(--accent); border-radius:var(--radius-pill); transition:width var(--transition); }
+.progress-text { font-size:var(--fs-sm); color:var(--text-muted); }
+.empty { text-align:center; padding:var(--space-7) var(--space-4); color:var(--text-muted); }
+.entry-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-4); margin-bottom:var(--space-3); }
+.entry-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:var(--space-2); flex-wrap:wrap; gap:var(--space-2); }
+.tag { display:inline-block; padding:2px 10px; background:var(--accent-soft); color:var(--accent); border-radius:var(--radius-pill); font-size:var(--fs-sm); font-weight:500; }
+.modal { position:fixed; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; z-index:100; padding:var(--space-4); }
+.modal[hidden] { display:none; }
+.modal-content { background:var(--surface); border-radius:var(--radius); padding:var(--space-5); width:100%; max-width:min(420px,calc(100vw - 24px)); max-height:calc(100dvh - 24px); max-height:calc(100vh - 24px); overflow-y:auto; box-shadow:var(--shadow); border:1px solid var(--border); }
+.form-row { margin-bottom:var(--space-4); }
+.form-actions { display:flex; gap:var(--space-3); justify-content:flex-end; margin-top:var(--space-5); }
+.filters { display:flex; gap:var(--space-3); flex-wrap:wrap; margin-bottom:var(--space-4); }
+.filters .input,.filters .select { width:auto; min-width:0; flex:1 1 140px; }
+.check-item { display:flex; align-items:center; gap:var(--space-3); padding:var(--space-2) 0; }
+.check-item input[type="checkbox"] { width:20px; height:20px; accent-color:var(--accent); }
+.quick-form { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-top:12px; }
+.quick-form .input,.quick-form .textarea,.quick-form .btn { flex:1 1 140px; min-width:0; }
+.fab { position:fixed; bottom:calc(84px + env(safe-area-inset-bottom,0px)); right:var(--space-4); width:56px; height:56px; border-radius:50%; background:var(--accent); color:white; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow); z-index:20; }
+@media (min-width:769px) { .fab { bottom:var(--space-6); } }
+.toast { position:fixed; bottom:calc(100px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-3) var(--space-4); box-shadow:var(--shadow); z-index:200; display:flex; gap:var(--space-3); align-items:center; }
+.calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.calendar-day { aspect-ratio:1; display:flex; align-items:center; justify-content:center; border-radius:var(--radius-sm); cursor:pointer; font-size:var(--fs-sm); }
+.calendar-day.has-entry { background:var(--accent-soft); }
+.calendar-day.today { border:2px solid var(--accent); }
+.icon { width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { transition:none !important; animation:none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="sidebar" id="sidebar">
+    <h1 id="app-title">Plainly</h1>
+    <a href="#today" class="nav-item" data-view="today"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Today</a>
+    <a href="#history" class="nav-item" data-view="history"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> History</a>
+    <a href="#calendar" class="nav-item" data-view="calendar"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Calendar</a>
+    <a href="#stats" class="nav-item" data-view="stats"><svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Trends</a>
+    <a href="#settings" class="nav-item" data-view="settings"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Settings</a>
+    <a href="#help" class="nav-item" data-view="help"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Help</a>
+    <a href="#privacy" class="nav-item" data-view="privacy"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Privacy</a>
+  </nav>
+  <main id="main" class="main"></main>
+  <nav class="bottom-nav">
+    <a href="#today" class="nav-item" data-view="today"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Today</a>
+    <a href="#history" class="nav-item" data-view="history"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> History</a>
+    <a href="#calendar" class="nav-item" data-view="calendar"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Calendar</a>
+    <a href="#stats" class="nav-item" data-view="stats"><svg class="icon" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Trends</a>
+    <a href="#settings" class="nav-item" data-view="settings"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/></svg> Settings</a>
+  </nav>
+</div>
+<button class="fab" id="fab" aria-label="Quick log">+</button>
+<div id="modal" class="modal" hidden><div class="modal-content"><div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h3 id="modal-title">Log</h3><button id="modal-close" aria-label="Close">&times;</button></div><form id="modal-form"></form></div></div>
+<div id="toast" class="toast" hidden></div>
+<script>
+const STORAGE_KEY = 'healthTracker_v1';
+const ACCENTS = { sage:'#6a8a72', teal:'#5d8a8a', clay:'#a67c52', slate:'#6b7c85' };
+
+// Safe storage: falls back to memory when localStorage is blocked (sandboxed iframes, etc.)
+const memoryStore = {};
+let storageAvailable = false;
+try {
+  const testKey = '__ht_test__';
+  localStorage.setItem(testKey, '1');
+  localStorage.removeItem(testKey);
+  storageAvailable = true;
+} catch (e) {
+  storageAvailable = false;
+  console.warn('localStorage unavailable (sandboxed or blocked). Using temporary memory storage. Data will not persist after reload.');
+}
+
+const storage = {
+  get(key) {
+    if (storageAvailable) {
+      try { return localStorage.getItem(key); } catch { return memoryStore[key] || null; }
+    }
+    return memoryStore[key] || null;
+  },
+  set(key, value) {
+    if (storageAvailable) {
+      try { localStorage.setItem(key, value); return true; } catch { memoryStore[key] = value; return false; }
+    }
+    memoryStore[key] = value;
+    return false;
+  },
+  remove(key) {
+    if (storageAvailable) {
+      try { localStorage.removeItem(key); } catch { delete memoryStore[key]; }
+    } else {
+      delete memoryStore[key];
+    }
+  }
+};
+
+const app = {
+  data: null, currentView: 'today', undoStack: [],
+  defaultData() {
+    return {
+      settings: { name:'', weightUnit:'kg', volumeUnit:'ml', weekStart:1, theme:'system', accent:'sage', dateFormat:'YYYY-MM-DD', timeFormat:'24', trackers:{water:true,sleep:true,exercise:true,weight:true,mood:true,meals:true,habits:true}, notifications:false, waterQuick:[250,500], showChecklist:true },
+      water:[], sleep:[], exercise:[], weight:[], mood:[], meals:[], items:[], checks:[], goals:[], tags:[], activityTypes:['Walk','Run','Cycle']
+    };
+  },
+  load() {
+    try {
+      const raw = storage.get(STORAGE_KEY);
+      this.data = raw ? JSON.parse(raw) : this.defaultData();
+      if (!this.data.settings) this.data.settings = this.defaultData().settings;
+      if (!this.data.settings.trackers) this.data.settings.trackers = this.defaultData().settings.trackers;
+      if (!this.data.settings.accent) this.data.settings.accent = 'sage';
+      if (!this.data.activityTypes) this.data.activityTypes = ['Walk','Run','Cycle'];
+      if (!this.data.tags) this.data.tags = [];
+      if (this.data.settings.waterQuick === undefined) this.data.settings.waterQuick = [250,500];
+    } catch { this.data = this.defaultData(); }
+  },
+  save() {
+    const ok = storage.set(STORAGE_KEY, JSON.stringify(this.data));
+    if (!ok && storageAvailable) {
+      this.showToast('Could not save. Storage may be full or blocked.');
+    }
+  },
+  getToday() { const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; },
+  escape(t) { if(!t) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; },
+  uuid() { return Date.now().toString(36)+Math.random().toString(36).slice(2,7); },
+  applyTheme() {
+    const t=this.data.settings.theme;
+    if(t==='dark') document.documentElement.setAttribute('data-theme','dark');
+    else if(t==='light') document.documentElement.setAttribute('data-theme','light');
+    else document.documentElement.removeAttribute('data-theme');
+    const acc=ACCENTS[this.data.settings.accent]||ACCENTS.sage;
+    document.documentElement.style.setProperty('--accent',acc);
+    document.documentElement.style.setProperty('--accent-hover',acc);
+  },
+  init() {
+    this.load(); this.applyTheme();
+    if (!storageAvailable) {
+      setTimeout(() => {
+        this.showToast('Storage is blocked in this view. Your data will not be saved after you leave or reload.');
+      }, 500);
+    }
+    if(this.data.settings.name) document.getElementById('app-title').textContent = this.data.settings.name + "'s Plainly";
+    const h=location.hash.slice(1)||'today';
+    this.currentView=['today','history','calendar','stats','settings','help','privacy'].includes(h)?h:'today';
+    if(!this.data.settings.name && !storage.get('setupDone')) this.showSetup();
+    else this.render();
+    this.bindGlobal();
+    window.addEventListener('hashchange',()=>{ const h=location.hash.slice(1)||'today'; if(['today','history','calendar','stats','settings','help','privacy'].includes(h)){ this.currentView=h; this.render(); } });
+    document.addEventListener('keydown',e=>{
+      if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+      if(e.key==='n'||e.key==='N'){ e.preventDefault(); this.openQuick(); }
+      if(e.key==='/'){ e.preventDefault(); location.hash='history'; setTimeout(()=>document.getElementById('filter-search')?.focus(),100); }
+      if(e.key==='?'){ e.preventDefault(); this.showShortcuts(); }
+    });
+  },
+  bindGlobal() {
+    document.getElementById('modal-close').onclick=()=>this.closeModal();
+    document.getElementById('modal').onclick=e=>{ if(e.target.id==='modal') this.closeModal(); };
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape') this.closeModal(); });
+    document.querySelectorAll('.nav-item').forEach(el=>el.onclick=e=>{ e.preventDefault(); location.hash=el.dataset.view; this.currentView=el.dataset.view; this.render(); });
+    document.getElementById('fab').onclick=()=>this.openQuick();
+  },
+  updateNav() { document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.view===this.currentView)); },
+  render() {
+    const main=document.getElementById('main'); main.innerHTML=''; this.updateNav();
+    if(this.currentView==='today') this.renderToday(main);
+    else if(this.currentView==='history') this.renderHistory(main);
+    else if(this.currentView==='calendar') this.renderCalendar(main);
+    else if(this.currentView==='stats') this.renderStats(main);
+    else if(this.currentView==='settings') this.renderSettings(main);
+    else if(this.currentView==='help') this.renderHelp(main);
+    else if(this.currentView==='privacy') this.renderPrivacy(main);
+  },
+  showToast(msg, undoFn) {
+    const t=document.getElementById('toast');
+    t.innerHTML=this.escape(msg)+ (undoFn?` <button class="btn btn-secondary" style="padding:4px 12px;min-height:32px;" id="undo-btn">Undo</button>`:'');
+    t.hidden=false;
+    if(undoFn) document.getElementById('undo-btn').onclick=()=>{ undoFn(); t.hidden=true; };
+    setTimeout(()=>t.hidden=true,6000);
+  },
+  showSetup() {
+    const main=document.getElementById('main');
+    main.innerHTML=`<h2>Welcome</h2><p class="progress-text">A short setup. You can skip any step.</p>
+      <form id="setup-form">
+        <div class="form-row"><label>Display name (optional)</label><input class="input" name="name" placeholder="Your name"></div>
+        <div class="form-row"><label>Weight unit</label><select class="select" name="weight"><option value="kg">Kilograms</option><option value="lb">Pounds</option></select></div>
+        <div class="form-row"><label>Volume unit</label><select class="select" name="volume"><option value="ml">Milliliters</option><option value="oz">Ounces</option></select></div>
+        <div class="form-row"><label>Trackers to show</label>
+          <label><input type="checkbox" name="t_water" checked> Water</label>
+          <label><input type="checkbox" name="t_sleep" checked> Sleep</label>
+          <label><input type="checkbox" name="t_exercise" checked> Exercise</label>
+          <label><input type="checkbox" name="t_weight" checked> Weight</label>
+          <label><input type="checkbox" name="t_mood" checked> Mood</label>
+          <label><input type="checkbox" name="t_meals" checked> Meals</label>
+          <label><input type="checkbox" name="t_habits" checked> Habits / Meds</label>
+        </div>
+        <div class="form-actions"><button type="button" class="btn btn-secondary" id="skip-setup">Skip</button><button type="submit" class="btn btn-primary">Finish</button></div>
+      </form>`;
+    document.getElementById('setup-form').onsubmit=e=>{
+      e.preventDefault();
+      const fd=new FormData(e.target);
+      this.data.settings.name=fd.get('name')||'';
+      this.data.settings.weightUnit=fd.get('weight');
+      this.data.settings.volumeUnit=fd.get('volume');
+      this.data.settings.trackers={ water:!!fd.get('t_water'), sleep:!!fd.get('t_sleep'), exercise:!!fd.get('t_exercise'), weight:!!fd.get('t_weight'), mood:!!fd.get('t_mood'), meals:!!fd.get('t_meals'), habits:!!fd.get('t_habits') };
+      storage.set('setupDone','1');
+      this.save(); this.applyTheme(); this.render();
+    };
+    document.getElementById('skip-setup').onclick=()=>{ storage.set('setupDone','1'); this.render(); };
+  },
+  renderToday(container) {
+    const today=this.getToday();
+    let html=`<h2>Today</h2>`;
+    if(this.data.settings.showChecklist) {
+      const done={ water:this.data.water.length>0, sleep:this.data.sleep.length>0, goal:this.data.goals.length>0, habit:this.data.items.length>0 };
+      if(Object.values(done).every(Boolean)) this.data.settings.showChecklist=false;
+      else html+=`<section class="section"><h3>Getting started</h3>
+        <div class="check-item"><input type="checkbox" disabled ${done.water?'checked':''}> Log your first water</div>
+        <div class="check-item"><input type="checkbox" disabled ${done.sleep?'checked':''}> Log your sleep</div>
+        <div class="check-item"><input type="checkbox" disabled ${done.goal?'checked':''}> Set a goal</div>
+        <div class="check-item"><input type="checkbox" disabled ${done.habit?'checked':''}> Add a habit</div></section>`;
+    }
+    const s=this.data.settings;
+    if(s.trackers.water) {
+      const goal=this.data.goals.find(g=>g.category==='water'&&g.period==='daily')||{target:2000};
+      const amt=this.data.water.filter(w=>w.date===today).reduce((a,b)=>a+(b.amount||0),0);
+      const pct=Math.min(100,Math.round(amt/goal.target*100));
+      const disp=s.volumeUnit==='oz'?Math.round(amt/29.5735):amt;
+      const gdisp=s.volumeUnit==='oz'?Math.round(goal.target/29.5735):goal.target;
+      html+=`<section class="section"><h3>Water</h3>
+        <div class="progress"><div class="progress-bar" style="width:${pct}%"></div></div>
+        <div class="progress-text">${disp} / ${gdisp} ${s.volumeUnit}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">${(s.waterQuick||[]).map(q=>`<button class="btn btn-secondary quick-water" data-amt="${q}">+${q}${s.volumeUnit==='oz'?'oz':'ml'}</button>`).join('')}</div>
+        <form class="quick-form" data-type="water"><input type="number" class="input" name="amount" placeholder="Amount" min="1" required><button class="btn btn-primary">Log water</button></form></section>`;
+    }
+    if(s.trackers.sleep) {
+      const sl=this.data.sleep.find(x=>x.date===today);
+      html+=`<section class="section"><h3>Sleep</h3>${sl?`<p>${sl.hours.toFixed(1)} hours (${this.escape(sl.bedtime)} – ${this.escape(sl.wake)})${sl.quality?` · Quality ${sl.quality}/5`:''}</p>`:'<p class="progress-text">No sleep logged today.</p>'}
+        <form class="quick-form" data-type="sleep"><input type="time" class="input" name="bedtime" required><input type="time" class="input" name="wake" required><select class="select" name="quality"><option value="">Quality (optional)</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select><button class="btn btn-primary">Save sleep</button></form></section>`;
+    }
+    if(s.trackers.exercise) {
+      const ex=this.data.exercise.filter(e=>e.date===today);
+      html+=`<section class="section"><h3>Exercise</h3>${ex.length?ex.map(e=>`<div class="entry-card">${this.escape(e.type)} · ${e.duration} min${e.distance?` · ${e.distance} km`:''}</div>`).join(''):'<p class="progress-text">No exercise logged today.</p>'}
+        <form class="quick-form" data-type="exercise"><input class="input" name="type" list="act-list" placeholder="Activity" required><datalist id="act-list">${this.data.activityTypes.map(t=>`<option value="${this.escape(t)}">`).join('')}</datalist><input type="number" class="input" name="duration" placeholder="Minutes" min="1" required><input type="number" class="input" name="distance" placeholder="Distance km (optional)" step="0.1"><textarea class="textarea" name="notes" placeholder="Notes"></textarea><button class="btn btn-primary">Log exercise</button></form></section>`;
+    }
+    if(s.trackers.weight) {
+      const w=[...this.data.weight].sort((a,b)=>b.date.localeCompare(a.date))[0];
+      html+=`<section class="section"><h3>Weight</h3>${w?`<p>${this.displayWeight(w.value)}</p>`:'<p class="progress-text">No weight logged.</p>'}
+        <form class="quick-form" data-type="weight"><input type="number" class="input" name="value" placeholder="Weight" step="0.1" min="0.1" required><button class="btn btn-primary">Log weight</button></form></section>`;
+    }
+    if(s.trackers.mood) {
+      const m=this.data.mood.find(x=>x.date===today);
+      html+=`<section class="section"><h3>Mood and energy</h3>${m?`<p>Mood ${m.mood}/5 · Energy ${m.energy}/5${m.note?' · '+this.escape(m.note):''}</p>`:'<p class="progress-text">No check-in today.</p>'}
+        <form class="quick-form" data-type="mood"><div style="display:flex;gap:6px;flex-wrap:wrap;">${[1,2,3,4,5].map(n=>`<button type="button" class="btn btn-secondary mood-btn" data-v="${n}">${n}</button>`).join('')}</div><input type="hidden" name="mood"><input type="hidden" name="energy"><textarea class="textarea" name="note" placeholder="Note"></textarea><button class="btn btn-primary">Save check-in</button></form></section>`;
+    }
+    if(s.trackers.meals) {
+      const ms=this.data.meals.filter(m=>m.date===today);
+      html+=`<section class="section"><h3>Meals</h3>${ms.length?ms.map(m=>`<div class="entry-card">${this.escape(m.type||'Meal')}: ${this.escape(m.description)}</div>`).join(''):'<p class="progress-text">No meals logged today.</p>'}
+        <form class="quick-form" data-type="meal"><select class="select" name="type"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select><input class="input" name="description" placeholder="Description" required><input type="time" class="input" name="time"><textarea class="textarea" name="note" placeholder="Note"></textarea><button class="btn btn-primary">Log meal</button></form></section>`;
+    }
+    if(s.trackers.habits && this.data.items.length) {
+      const checks=this.data.checks.filter(c=>c.date===today);
+      html+=`<section class="section"><h3>Medications and habits</h3>${this.data.items.map(item=>{
+        const done=checks.some(c=>c.itemId===item.id&&c.done);
+        const streak=this.calcStreak(item.id);
+        return `<div class="check-item"><input type="checkbox" data-item="${item.id}" ${done?'checked':''}> <span>${this.escape(item.name)} ${streak?`<span class="tag">${streak}d</span>`:''}</span></div>`;
+      }).join('')}</section>`;
+    }
+    container.innerHTML=html;
+    this.bindToday(container);
+  },
+  bindToday(c) {
+    c.querySelectorAll('.quick-form').forEach(f=>f.onsubmit=e=>{ e.preventDefault(); this.addEntry(f.dataset.type,Object.fromEntries(new FormData(f))); f.reset(); this.render(); });
+    c.querySelectorAll('.quick-water').forEach(b=>b.onclick=()=>{ this.addEntry('water',{amount:b.dataset.amt}); this.render(); });
+    c.querySelectorAll('.mood-btn').forEach(b=>b.onclick=()=>{ c.querySelectorAll('.mood-btn').forEach(x=>x.classList.remove('btn-primary')); b.classList.add('btn-primary'); c.querySelector('[name="mood"]').value=b.dataset.v; c.querySelector('[name="energy"]').value=b.dataset.v; });
+    c.querySelectorAll('input[data-item]').forEach(cb=>cb.onchange=()=>{ this.toggleCheck(cb.dataset.item,cb.checked); this.render(); });
+  },
+  displayWeight(kg) { return this.data.settings.weightUnit==='lb'?(kg*2.20462).toFixed(1)+' lb':kg.toFixed(1)+' kg'; },
+  calcStreak(id) {
+    let streak=0; let d=new Date();
+    for(let i=0;i<365;i++) {
+      const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      if(this.data.checks.some(c=>c.itemId===id&&c.date===ds&&c.done)) streak++; else if(i>0) break;
+      d.setDate(d.getDate()-1);
+    }
+    return streak;
+  },
+  addEntry(type,vals) {
+    const today=this.getToday(); const id=this.uuid();
+    if(type==='water') { let a=parseFloat(vals.amount)||0; if(this.data.settings.volumeUnit==='oz') a*=29.5735; this.data.water.push({id,date:today,amount:a}); }
+    else if(type==='sleep') {
+      this.data.sleep=this.data.sleep.filter(s=>s.date!==today);
+      let hours=0; if(vals.bedtime&&vals.wake){ const [bh,bm]=vals.bedtime.split(':').map(Number); const [wh,wm]=vals.wake.split(':').map(Number); let m=(wh*60+wm)-(bh*60+bm); if(m<0)m+=1440; hours=m/60; }
+      this.data.sleep.push({id,date:today,bedtime:vals.bedtime,wake:vals.wake,hours,quality:parseInt(vals.quality)||0});
+    }
+    else if(type==='exercise') this.data.exercise.push({id,date:today,type:vals.type,duration:parseInt(vals.duration)||0,distance:parseFloat(vals.distance)||0,notes:vals.notes||''});
+    else if(type==='weight') { let v=parseFloat(vals.value)||0; if(this.data.settings.weightUnit==='lb') v/=2.20462; this.data.weight.push({id,date:today,value:v}); }
+    else if(type==='mood') { this.data.mood=this.data.mood.filter(m=>m.date!==today); this.data.mood.push({id,date:today,mood:parseInt(vals.mood)||0,energy:parseInt(vals.energy)||0,note:vals.note||''}); }
+    else if(type==='meal') this.data.meals.push({id,date:today,type:vals.type,description:vals.description,time:vals.time||'',note:vals.note||''});
+    this.save();
+  },
+  toggleCheck(id,done) {
+    const today=this.getToday();
+    this.data.checks=this.data.checks.filter(c=>!(c.date===today&&c.itemId===id));
+    if(done) this.data.checks.push({id:this.uuid(),date:today,itemId:id,done:true});
+    this.save();
+  },
+  openQuick() {
+    this.openModal('Quick log',`<div class="form-row"><label>Type</label><select class="select" name="qtype"><option value="water">Water</option><option value="sleep">Sleep</option><option value="exercise">Exercise</option><option value="weight">Weight</option><option value="mood">Mood</option><option value="meal">Meal</option></select></div><div class="form-row"><input class="input" name="amount" placeholder="Amount / value / description"></div><div class="form-actions"><button type="button" class="btn btn-secondary" id="qcancel">Cancel</button><button type="submit" class="btn btn-primary">Add</button></div>`);
+    document.getElementById('modal-form').onsubmit=e=>{ e.preventDefault(); const fd=new FormData(e.target); const t=fd.get('qtype'); const v=fd.get('amount'); if(t==='water') this.addEntry('water',{amount:v}); else if(t==='weight') this.addEntry('weight',{value:v}); else if(t==='meal') this.addEntry('meal',{description:v,type:'Meal'}); this.closeModal(); this.render(); };
+    document.getElementById('qcancel').onclick=()=>this.closeModal();
+  },
+  openModal(title,html) { document.getElementById('modal-title').textContent=title; document.getElementById('modal-form').innerHTML=html; document.getElementById('modal').hidden=false; },
+  closeModal() { document.getElementById('modal').hidden=true; },
+  renderHistory(c) {
+    c.innerHTML=`<h2>History</h2><div class="filters"><select class="select" id="filter-type"><option value="">All</option><option value="water">Water</option><option value="sleep">Sleep</option><option value="exercise">Exercise</option><option value="weight">Weight</option><option value="mood">Mood</option><option value="meal">Meals</option></select><input type="date" class="input" id="filter-from"><input type="date" class="input" id="filter-to"><input type="search" class="input" id="filter-search" placeholder="Search"></div><div id="history-list"></div>`;
+    this.renderHistoryList();
+    ['filter-type','filter-from','filter-to','filter-search'].forEach(id=>document.getElementById(id).oninput=()=>this.renderHistoryList());
+  },
+  renderHistoryList() {
+    const type=document.getElementById('filter-type')?.value||'';
+    const from=document.getElementById('filter-from')?.value||'';
+    const to=document.getElementById('filter-to')?.value||'';
+    const q=(document.getElementById('filter-search')?.value||'').toLowerCase();
+    const list=document.getElementById('history-list'); if(!list) return;
+    let ents=[];
+    const add=(arr,cat)=>arr.forEach(e=>ents.push({...e,category:cat}));
+    add(this.data.water,'water'); add(this.data.sleep,'sleep'); add(this.data.exercise,'exercise'); add(this.data.weight,'weight'); add(this.data.mood,'mood'); add(this.data.meals,'meal');
+    ents=ents.filter(e=>(!type||e.category===type)&&(!from||e.date>=from)&&(!to||e.date<=to)&&(!q||JSON.stringify(e).toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date));
+    if(!ents.length) { list.innerHTML='<div class="empty">No entries match.<br><button class="btn btn-primary" onclick="location.hash=\'today\'">Log an entry</button></div>'; return; }
+    list.innerHTML=ents.map(e=>{
+      let d=''; if(e.category==='water') d=Math.round(e.amount)+' ml'; else if(e.category==='sleep') d=e.hours.toFixed(1)+' h'; else if(e.category==='exercise') d=this.escape(e.type)+' · '+e.duration+' min'; else if(e.category==='weight') d=this.displayWeight(e.value); else if(e.category==='mood') d='Mood '+e.mood; else if(e.category==='meal') d=this.escape(e.description);
+      return `<div class="entry-card"><div class="entry-header"><div><span class="tag">${e.category}</span> ${e.date}<br>${d}</div><div><button class="btn btn-secondary" data-edit="${e.category}:${e.id}" style="padding:6px 12px;min-height:36px;">Edit</button> <button class="btn btn-secondary" data-del="${e.category}:${e.id}" style="padding:6px 12px;min-height:36px;">Delete</button></div></div></div>`;
+    }).join('');
+    list.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+      const [cat,id]=b.dataset.del.split(':');
+      const arrName=cat==='meal'?'meals':cat;
+      const old=JSON.parse(JSON.stringify(this.data[arrName]));
+      this.data[arrName]=this.data[arrName].filter(x=>x.id!==id);
+      this.save(); this.renderHistoryList();
+      this.showToast('Entry deleted',()=>{ this.data[arrName]=old; this.save(); this.renderHistoryList(); });
+    });
+    list.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{
+      const [cat,id]=b.dataset.edit.split(':');
+      const arr=this.data[cat==='meal'?'meals':cat];
+      const entry=arr.find(x=>x.id===id);
+      if(entry) this.openEdit(cat,entry);
+    });
+  },
+  openEdit(cat,entry) {
+    let form='';
+    if(cat==='water') form=`<div class="form-row"><label>Amount (ml)</label><input class="input" type="number" name="amount" value="${entry.amount}" required></div>`;
+    else if(cat==='sleep') form=`<div class="form-row"><label>Bedtime</label><input class="input" type="time" name="bedtime" value="${entry.bedtime||''}"></div><div class="form-row"><label>Wake</label><input class="input" type="time" name="wake" value="${entry.wake||''}"></div>`;
+    else if(cat==='exercise') form=`<div class="form-row"><label>Type</label><input class="input" name="type" value="${this.escape(entry.type)}"></div><div class="form-row"><label>Minutes</label><input class="input" type="number" name="duration" value="${entry.duration}"></div>`;
+    else if(cat==='weight') form=`<div class="form-row"><label>Weight (kg)</label><input class="input" type="number" step="0.1" name="value" value="${entry.value}"></div>`;
+    else if(cat==='mood') form=`<div class="form-row"><label>Mood</label><input class="input" type="number" name="mood" value="${entry.mood}" min="1" max="5"></div>`;
+    else if(cat==='meal') form=`<div class="form-row"><label>Description</label><input class="input" name="description" value="${this.escape(entry.description)}"></div>`;
+    form+=`<div class="form-actions"><button type="button" class="btn btn-secondary" id="ecancel">Cancel</button><button type="submit" class="btn btn-primary">Save</button></div>`;
+    this.openModal('Edit',form);
+    document.getElementById('modal-form').onsubmit=e=>{ e.preventDefault(); this.saveEdit(cat,entry.id,new FormData(e.target)); };
+    document.getElementById('ecancel').onclick=()=>this.closeModal();
+  },
+  saveEdit(cat,id,fd) {
+    const arrName=cat==='meal'?'meals':cat;
+    const entry=this.data[arrName].find(x=>x.id===id); if(!entry) return;
+    if(cat==='water') entry.amount=parseFloat(fd.get('amount'))||0;
+    else if(cat==='sleep') { entry.bedtime=fd.get('bedtime'); entry.wake=fd.get('wake'); if(entry.bedtime&&entry.wake){ const [bh,bm]=entry.bedtime.split(':').map(Number); const [wh,wm]=entry.wake.split(':').map(Number); let m=(wh*60+wm)-(bh*60+bm); if(m<0)m+=1440; entry.hours=m/60; } }
+    else if(cat==='exercise') { entry.type=fd.get('type'); entry.duration=parseInt(fd.get('duration'))||0; }
+    else if(cat==='weight') entry.value=parseFloat(fd.get('value'))||0;
+    else if(cat==='mood') entry.mood=parseInt(fd.get('mood'))||0;
+    else if(cat==='meal') entry.description=fd.get('description');
+    this.save(); this.closeModal(); this.render();
+    this.showToast('Entry updated',()=>this.render());
+  },
+  renderCalendar(c) {
+    const now=new Date(); const y=now.getFullYear(), m=now.getMonth();
+    const first=new Date(y,m,1); const start=first.getDay();
+    const days=new Date(y,m+1,0).getDate();
+    let html=`<h2>Calendar</h2><div class="calendar-grid">`;
+    for(let i=0;i<start;i++) html+='<div></div>';
+    for(let d=1;d<=days;d++) {
+      const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const has=this.data.water.some(x=>x.date===ds)||this.data.sleep.some(x=>x.date===ds)||this.data.exercise.some(x=>x.date===ds)||this.data.weight.some(x=>x.date===ds)||this.data.mood.some(x=>x.date===ds)||this.data.meals.some(x=>x.date===ds);
+      html+=`<div class="calendar-day ${has?'has-entry':''} ${ds===this.getToday()?'today':''}" data-date="${ds}">${d}</div>`;
+    }
+    html+='</div>';
+    c.innerHTML=html;
+    c.querySelectorAll('.calendar-day[data-date]').forEach(el=>el.onclick=()=>{
+      const date=el.dataset.date;
+      this.openModal(date,`<p>Entries on this day can be viewed in History. <button class="btn btn-primary" onclick="location.hash='history'">Go to History</button></p><div class="form-actions"><button type="button" class="btn btn-secondary" id="cc">Close</button></div>`);
+      document.getElementById('cc').onclick=()=>this.closeModal();
+    });
+  },
+  renderStats(c) {
+    c.innerHTML=`<h2>Trends</h2>`;
+    const has=this.data.weight.length||this.data.sleep.length||this.data.water.length||this.data.exercise.length;
+    if(!has) { c.innerHTML+='<div class="empty">Log a few entries to see trends.<br><button class="btn btn-primary" onclick="location.hash=\'today\'">Log an entry</button></div>'; return; }
+    if(this.data.weight.length>=2) {
+      const sorted=[...this.data.weight].sort((a,b)=>a.date.localeCompare(b.date));
+      c.innerHTML+=`<section class="section"><h3>Weight</h3><div id="wchart"></div></section>`;
+      this.drawChart('wchart',sorted.map(w=>({x:w.date,y:w.value})));
+    } else c.innerHTML+='<p class="progress-text">Need at least 2 weight entries for a trend.</p>';
+    if(this.data.sleep.length) {
+      const a7=this.data.sleep.slice(-7).reduce((s,x)=>s+x.hours,0)/(Math.min(7,this.data.sleep.length)||1);
+      c.innerHTML+=`<section class="section"><h3>Sleep average (recent)</h3><p>${a7.toFixed(1)} hours</p></section>`;
+    }
+    const weekStart=this.getWeekStart(this.getToday());
+    const weekEx=this.data.exercise.filter(e=>e.date>=weekStart).reduce((s,e)=>s+e.duration,0);
+    c.innerHTML+=`<section class="section"><h3>Exercise this week</h3><p>${weekEx} minutes</p></section>`;
+  },
+  getWeekStart(ds) { const d=new Date(ds+'T00:00:00'); const day=d.getDay(); const diff=(day-this.data.settings.weekStart+7)%7; d.setDate(d.getDate()-diff); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; },
+  drawChart(id,pts) {
+    const el=document.getElementById(id); if(!el||pts.length<2) return;
+    const w=600,h=180,pad=30;
+    const ys=pts.map(p=>p.y); const min=Math.min(...ys)*0.95, max=Math.max(...ys)*1.05;
+    const path=pts.map((p,i)=>{ const x=pad+(i/(pts.length-1))*(w-pad*2); const y=h-pad-((p.y-min)/(max-min))*(h-pad*2); return (i?'L':'M')+x+','+y; }).join(' ');
+    el.innerHTML=`<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:180px;"><path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/><text x="${pad}" y="${h-8}" font-size="11" fill="var(--text-muted)">${pts[0].x}</text><text x="${w-pad-50}" y="${h-8}" font-size="11" fill="var(--text-muted)">${pts[pts.length-1].x}</text></svg>`;
+  },
+  renderSettings(c) {
+    const s=this.data.settings;
+    c.innerHTML=`<h2>Settings</h2>
+      <section class="section"><h3>Profile</h3><div class="form-row"><label>Display name</label><input class="input" id="set-name" value="${this.escape(s.name||'')}"></div>
+        <div class="form-row"><label>Theme</label><select class="select" id="set-theme"><option value="system" ${s.theme==='system'?'selected':''}>System</option><option value="light" ${s.theme==='light'?'selected':''}>Light</option><option value="dark" ${s.theme==='dark'?'selected':''}>Dark</option></select></div>
+        <div class="form-row"><label>Accent</label><select class="select" id="set-accent">${Object.keys(ACCENTS).map(k=>`<option value="${k}" ${s.accent===k?'selected':''}>${k}</option>`).join('')}</select></div>
+        <div class="form-row"><label>Weight unit</label><select class="select" id="set-wu"><option value="kg" ${s.weightUnit==='kg'?'selected':''}>kg</option><option value="lb" ${s.weightUnit==='lb'?'selected':''}>lb</option></select></div>
+        <div class="form-row"><label>Volume unit</label><select class="select" id="set-vu"><option value="ml" ${s.volumeUnit==='ml'?'selected':''}>ml</option><option value="oz" ${s.volumeUnit==='oz'?'selected':''}>oz</option></select></div>
+        <div class="form-row"><label>Week starts</label><select class="select" id="set-ws"><option value="0" ${s.weekStart===0?'selected':''}>Sunday</option><option value="1" ${s.weekStart===1?'selected':''}>Monday</option></select></div>
+        <button class="btn btn-primary" id="save-set">Save settings</button></section>
+      <section class="section"><h3>Trackers</h3>${Object.keys(s.trackers).map(k=>`<label><input type="checkbox" data-tracker="${k}" ${s.trackers[k]?'checked':''}> ${k}</label><br>`).join('')}</section>
+      <section class="section"><h3>Habits / medications</h3><form id="add-item"><div class="form-row"><input class="input" name="name" placeholder="Name" required></div><button class="btn btn-primary">Add</button></form><div id="items-list">${(this.data.items||[]).map(i=>`<div class="entry-card">${this.escape(i.name)} <button class="btn btn-secondary" data-deli="${i.id}" style="float:right;padding:4px 10px;">Remove</button></div>`).join('')||'<p class="progress-text">None yet.</p>'}</div></section>
+      <section class="section"><h3>Goals</h3><form id="add-goal"><div class="form-row"><select class="select" name="cat"><option value="water">Water (ml daily)</option><option value="exercise">Exercise (min weekly)</option><option value="sleep">Sleep (hours daily)</option></select></div><div class="form-row"><input type="number" class="input" name="target" placeholder="Target" required></div><button class="btn btn-primary">Add goal</button></form><div>${(this.data.goals||[]).map(g=>`<div class="entry-card">${g.category} · ${g.target} · ${g.period} <button class="btn btn-secondary" data-delg="${g.id}" style="float:right;padding:4px 10px;">Remove</button></div>`).join('')}</div></section>
+      <section class="section"><h3>Data</h3><button class="btn btn-secondary" id="export-json">Export JSON</button> <button class="btn btn-secondary" id="export-csv">Export CSV</button> <button class="btn btn-secondary" id="import-btn">Import JSON</button><input type="file" id="import-file" accept=".json" hidden> <button class="btn btn-secondary" id="delete-all" style="color:#c45c5c;">Delete all data</button></section>
+      <section class="section"><h3>Checklist</h3><button class="btn btn-secondary" id="show-check">Show getting-started checklist again</button></section>
+      <section class="section"><h3>Disclaimer</h3><p>This tool is for personal tracking and does not give medical advice or diagnoses. Consult a professional for health concerns.</p></section>`;
+    document.getElementById('save-set').onclick=()=>{
+      this.data.settings.name=document.getElementById('set-name').value;
+      this.data.settings.theme=document.getElementById('set-theme').value;
+      this.data.settings.accent=document.getElementById('set-accent').value;
+      this.data.settings.weightUnit=document.getElementById('set-wu').value;
+      this.data.settings.volumeUnit=document.getElementById('set-vu').value;
+      this.data.settings.weekStart=parseInt(document.getElementById('set-ws').value);
+      this.applyTheme(); this.save(); alert('Settings saved.'); this.render();
+    };
+    document.querySelectorAll('[data-tracker]').forEach(cb=>cb.onchange=()=>{ this.data.settings.trackers[cb.dataset.tracker]=cb.checked; this.save(); });
+    document.getElementById('add-item').onsubmit=e=>{ e.preventDefault(); this.data.items.push({id:this.uuid(),name:new FormData(e.target).get('name'),type:'habit',schedule:'daily'}); this.save(); this.render(); };
+    document.querySelectorAll('[data-deli]').forEach(b=>b.onclick=()=>{ this.data.items=this.data.items.filter(i=>i.id!==b.dataset.deli); this.save(); this.render(); });
+    document.getElementById('add-goal').onsubmit=e=>{ e.preventDefault(); const fd=new FormData(e.target); this.data.goals.push({id:this.uuid(),category:fd.get('cat'),target:parseFloat(fd.get('target')),period:fd.get('cat')==='exercise'?'weekly':'daily'}); this.save(); this.render(); };
+    document.querySelectorAll('[data-delg]').forEach(b=>b.onclick=()=>{ this.data.goals=this.data.goals.filter(g=>g.id!==b.dataset.delg); this.save(); this.render(); });
+    document.getElementById('export-json').onclick=()=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(this.data,null,2)],{type:'application/json'})); a.download='plainly-backup.json'; a.click(); };
+    document.getElementById('export-csv').onclick=()=>{
+      let csv='type,date,details\n';
+      this.data.water.forEach(w=>csv+=`water,${w.date},${w.amount} ml\n`);
+      this.data.sleep.forEach(s=>csv+=`sleep,${s.date},${s.hours} h\n`);
+      this.data.exercise.forEach(e=>csv+=`exercise,${e.date},${e.type} ${e.duration} min\n`);
+      this.data.weight.forEach(w=>csv+=`weight,${w.date},${w.value} kg\n`);
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='plainly-backup.csv'; a.click();
+    };
+    document.getElementById('import-btn').onclick=()=>document.getElementById('import-file').click();
+    document.getElementById('import-file').onchange=e=>{
+      const f=e.target.files[0]; if(!f) return;
+      const r=new FileReader(); r.onload=()=>{ try { const imp=JSON.parse(r.result); if(!imp.settings||!Array.isArray(imp.water)) throw new Error(); if(confirm('Replace all data with this backup?')) { this.data=imp; this.save(); this.applyTheme(); this.render(); alert('Imported.'); } } catch { alert('Invalid file. It must be a JSON backup from Plainly.'); } }; r.readAsText(f);
+    };
+    document.getElementById('delete-all').onclick=()=>{ if(confirm('Delete all data permanently? This cannot be undone.')) { this.data=this.defaultData(); this.save(); storage.remove('setupDone'); this.render(); alert('All data deleted.'); } };
+    document.getElementById('show-check').onclick=()=>{ this.data.settings.showChecklist=true; this.save(); this.render(); };
+  },
+  renderHelp(c) {
+    c.innerHTML=`<h2>Help</h2>
+      <section class="section"><h3>How goals work</h3><p>Set a daily or weekly target in Settings. Progress on Today updates from your real entries.</p></section>
+      <section class="section"><h3>Edit a past entry</h3><p>Go to History, use the filters or search, then click Edit on the entry.</p></section>
+      <section class="section"><h3>Back up data</h3><p>In Settings use Export JSON. Keep the file safe. Import restores it later.</p></section>
+      <section class="section"><h3>Where is data stored</h3><p>Only in this browser's local storage. Nothing is sent anywhere. Clearing site data erases it.</p></section>
+      <section class="section"><h3>Shortcuts</h3><p>N — quick log<br>/ — search history<br>? — this list<br>Esc — close modal</p></section>
+      <section class="section"><h3>Disclaimer</h3><p>This tool is for personal tracking and does not give medical advice or diagnoses.</p></section>`;
+  },
+  renderPrivacy(c) {
+    c.innerHTML=`<h2>Privacy</h2><section class="section"><p>All data stays on this device in your browser's local storage. Nothing is sent to any server.</p><p style="margin-top:12px;">Clearing browser data or using private mode erases everything stored here.</p><p style="margin-top:12px;">Export a backup from Settings at any time.</p></section><section class="section"><h3>Disclaimer</h3><p>This tool is for personal tracking only. It does not provide medical advice, diagnoses, or treatment recommendations.</p></section>`;
+  },
+  showShortcuts() { this.openModal('Shortcuts','<p>N — quick log<br>/ — focus search<br>? — this list<br>Esc — close</p><div class="form-actions"><button type="button" class="btn btn-primary" id="sc">Close</button></div>'); document.getElementById('sc').onclick=()=>this.closeModal(); }
+};
+document.addEventListener('DOMContentLoaded',()=>app.init());
+</script>
+</body>
+</html>
